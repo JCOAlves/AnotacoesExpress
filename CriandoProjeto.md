@@ -40,7 +40,7 @@ estão instalados e sua versão.
    ```bash
    npm audit fix --force
    ```
-   caso aprsente algum erro no comando:
+   caso apresente algum erro no comando:
    ```bash
    npx audit fix --force
    ```
