@@ -49,3 +49,4 @@ estão instalados e sua versão.
    ```bash
    npm start
    ```
+8. Por fim, abra um browser e acesse o endereço ```localhost```, utilizando a porta ```3000```: ```localhost:3000```.
