@@ -54,7 +54,7 @@ module.exports = router;
 - **`let db = require('../utils/db');`**: Importação do objeto da conexão MySQL
 - **`router.get`**: Método GET HTTP
 - **`'/autores/listar'`**: Rota GET do Express.
-- **`db.query`**: Função Express para seleção dos dados.
+- **`db.query`**: Função Express de consulta ao banco. 
 - **`'SELECT * FROM TbAutor'`**: Script MySQL para seleção dos dados do banco.
 - **`[]`**: Lista com os parâmetros para a consulta, não sendo necessario para funções do método GET.
 - **`function(erro, listagem)`**: Função com os parâmetros `erro`, a qual guarda e retorna um erro na consulta, se tiver, e `listagem`, onde guarda uma lista JSON  com os dados do banco, podendo ser nomeada da forma que quiser.
