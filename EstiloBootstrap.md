@@ -3,9 +3,8 @@ Bootstrap é um framework de front-end robusto, responsivo e que auxilia no dese
 códigos HTML, CSS e JavaScript. Com o Bootstrap você pode utilizar diversos estilos e, para isso, basta
 escolher aquele que mais te agrada. 
 
-Comece com Bootstrap acessando o site: ("Bootstrap")["https://getbootstrap.com/docs/5.3/getting-started/introduction/"].
+Comece com Bootstrap acessando o site: https://getbootstrap.com/docs/5.3/getting-started/introduction/.
 
-## 1. Adicionando Bootstrap no script
 Para adicionar Bootstrap no scripts, basta adicionar os scripts abaixo no html:
 - **CSS**: https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css
 - **JavaScript**: https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js
