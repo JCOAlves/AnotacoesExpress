@@ -18,6 +18,7 @@ npm install –-save nodemon
 ```javascript
 /* Rota para incluir dados de autor*/
 router.post('/add', function(req, res) {
+    //É no body que estão os dados passados na requisição.
     let nome = req.body.nome;
     let nacionalidade = req.body.nacionalidade;
 
@@ -72,8 +73,8 @@ router.get('/edit/:id', function(req, res) {
 ```javascript
 /* Rota para alterar dados de autor*/
 router.put('/edit/:id', function(req, res) {
-    let id = req.params.id; 
-    let nome = req.body.nome; 
+    let id = req.params.id; //Parâmetro da rota com o identicidor (id)
+    let nome = req.body.nome; //É no body que estão os dados passados na requisição.
     let nacionalidade = req.body.nacionalidade;
 
     let cmd = "UPDATE TbAutor SET NoAutor = ?, IdNacionalidade = ? WHERE IdAutor = ?;";
@@ -87,18 +88,18 @@ router.put('/edit/:id', function(req, res) {
     });
 });
 ```
-- **`router.put`**: Método PUT HTTP de listagem de dados.
+- **`router.put`**: Método PUT HTTP de atualização de dados.
 - **`let cmd`**: Variavel que armazena o comando SQL.
-- **` `**:
-- **` `**:
-- **` `**:
-- **` `**: 
+- **`UPDATE TbAutor`**: Comando SQL que atualiza os dados da tabela.
+- **`SET NoAutor`**: Condicional que diz quais colunas da tabela serão atualizadas
+- **`WHERE IdAutor`**: Condicional que diz quais dados serão atualizados ou não.
+- **`[nome, nacionalidade, id]`**: Lista com as variaveis parâmetros que atualizarão os dados.
 
 ### Deletar dados (Delete)
 ```javascript
 /*Rota para excluir dados de autor*/
 router.delete('/delete/:id', function(req, res) {
-    let id = req.params.id; //Recupera parâmentro da rota
+    let id = req.params.id; //Recupera parâmentro id da rota
     let cmd = "DELETE FROM TbAutor WHERE IdAutor = ?;";
     db.query(cmd, [id], function(erro, listagem){
         if (erro){
@@ -109,14 +110,28 @@ router.delete('/delete/:id', function(req, res) {
 });
 ```
 - **`router.delete`**: Método DELETE HTTP de listagem de dados.
-- **`let cmd`**:
-- **` `**:
-- **` `**:
-- **` `**:
-- **` `**: 
+- **`let cmd`**: Variavel que armazena o comando SQL.
+- **`DELETE FROM TbAutor`**: Comando SQL que deleta os dados da tabela.
+- **`WHERE IdAutor;`**: Condicional que diz quais dados serão deletados ou não.
+- **`[id]`**: Lista com as variaveis parâmetros, sendo utilizada para identificar um dado espefico.
 
 ## 3. Fazendo requisições API no `JavaScript`
+No parte de interação e contado com o usuário, Frontend, é realizado requisições JavaScript, 
+como POST, GET, PUT ou DELETE, para parte das rotas do servidor do projeto, Backend. Assim,
+é utilizado a função `fetch` do JS.
 
+### Método Fetch/POST
+```javascript
+```
 
+### Método Fetch/GET
+```javascript
+```
 
+### Método Fetch/PUT
+```javascript
+```
 
+### Método Fetch/DELETE
+```javascript
+```
