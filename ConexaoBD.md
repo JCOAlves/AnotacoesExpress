@@ -74,7 +74,7 @@ router.get('/autores/listar', function(req, res) {
          res.send(erro);
       }
 
-      /* Criaremos a view autores-lista no próximo slide*/
+      /* Renderiza os dados de listagem no ejs*/
       res.render('autores-lista', {resultado: listagem});
    });
 });
