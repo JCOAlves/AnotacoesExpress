@@ -9,9 +9,23 @@ o aplicativo quando são detectadas alterações em arquivos, visto que anteriom
 os arquivos para que as mudanças nos scripts sejam detectadas. Com isso, para instala-lo, use o comanda a seguir no terminal, 
 dentro da pasta do projeto:
 
-```bash
-npm install –-save nodemon
-```
+- Instalação: Recomenda-se instalá-lo como dependência de desenvolvimento:
+  ```bash
+  npm install --save-dev nodemon
+  ```
+- Como usar:
+  1. No arquivo package.json, adicione um script na seção "scripts". Recomendo manter o comando `start` original e criar um novo chamado `dev`:
+    ```json
+    "scripts": {
+        "start": "node ./bin/www",
+        "dev": "nodemon ./bin/www"
+    },
+    ```
+
+  2. Agora para rodar o projeto, em vez de usar `npm start`, você usará o comando abaixo no seu terminal:
+     ```bash
+     npm run dev
+     ```
 
 ## 2. Criando funções CRUD nas rotas
 ### Criar dados (Create)
@@ -122,7 +136,7 @@ como POST, GET, PUT ou DELETE, para parte das rotas do servidor do projeto, Back
 
 ### Método Fetch/POST
 ```javascript
-async function POST(rota, objeto) {
+async function POST(rota, objeto) { //Função assincrona para requisições HTTP
     try {
         const objetoJSON = JSON.stringify(objeto); //Converte objeto JS com os dados em formato JSON
         let resposta = await fetch(rota, {
@@ -133,7 +147,7 @@ async function POST(rota, objeto) {
         resposta = await resposta.json(); //Converte a resposta em formato JSON
         return resposta //Retorna a resposta do método POST.
     }
-    catch (erro) { //O catch encontra e trata erros na requisição.
+    catch (erro) { //Encontra e trata erros na requisição.
         console.error(`Falha na requisição: ${erro.message || erro}`)
     }
 };

@@ -8,8 +8,6 @@ compras e preferências personalizadas, usando o middleware `express-session` pa
     ```bash
     npm install express-session
     ```
-
-## 2. Instalando o express-session
 2. Importe o módulo e configure o middleware antes das suas rotas no arquivo principal (`App.js`):
     ```javascript
     const express = require('express');
@@ -48,7 +46,5 @@ Como funciona
 - Cookie: O express-session gera um ID único e o envia para o navegador do usuário em um cookie.
 - Requisições subsequentes: O navegador envia o cookie de volta com cada requisição.
 - req.session: O middleware usa o ID para carregar os dados da sessão (armazenados no servidor) no objeto req.session para você usar nas suas rotas.
-- Segurança: Em produção, configure cookie: { secure: true, httpOnly: true, sameSite: 'strict' } para proteger contra ataques. 
+- Segurança: Em produção, configure `cookie: { secure: true, httpOnly: true, sameSite: 'strict' }` para proteger contra ataques. 
 Com esses passos, você implementa sessões para rastrear usuários e gerenciar o estado do login em sua aplicação Express. 
-
-
