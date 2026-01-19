@@ -21,6 +21,7 @@ dentro da pasta do projeto:
         "dev": "nodemon ./bin/www"
     },
     ```
+    Se quiser garantir que ele monitore também arquivos .json ou extensões de visualização como .ejs, você pode usar: `"dev": "nodemon ./bin/www -e js,json,ejs"`
 
   2. Agora para rodar o projeto, em vez de usar `npm start`, você usará o comando abaixo no seu terminal:
      ```bash
