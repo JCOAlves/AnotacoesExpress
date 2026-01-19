@@ -122,16 +122,76 @@ como POST, GET, PUT ou DELETE, para parte das rotas do servidor do projeto, Back
 
 ### Método Fetch/POST
 ```javascript
+async function POST(rota, objeto) {
+    try {
+        const objetoJSON = JSON.stringify(objeto); //Converte objeto JS com os dados em formato JSON
+        let resposta = await fetch(rota, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }, //Informa o tipo de dado a ser enviador ao servidor.
+            body: objetoJSON
+        })
+        resposta = await resposta.json(); //Converte a resposta em formato JSON
+        return resposta //Retorna a resposta do método POST.
+    }
+    catch (erro) { //O catch encontra e trata erros na requisição.
+        console.error(`Falha na requisição: ${erro.message || erro}`)
+    }
+};
 ```
 
 ### Método Fetch/GET
 ```javascript
+async function GET(rota){ 
+    try { 
+        let resposta = await fetch(rota); // Busca os dados na rota fornecida
+
+        // Verifica se a resposta HTTP é OK (200-299). 404/500 não rejeitam a Promise por padrão [3, 5].
+        if (!resposta.ok) {
+            throw new Error(`Erro HTTP! Status: ${response.status}`);
+        }
+
+        // Converte a resposta para JSON (ou .text(), .blob(), etc.)
+        const dados = await resposta.json();
+        return dados; // Retorna os dados buscados.
+
+    } catch (erro) {
+        console.error(`Falha na requisição: ${erro.message || erro}`);
+    }
+};
 ```
 
 ### Método Fetch/PUT
 ```javascript
+async function PUT(rotaEspecifica, objeto) {
+    try {
+        const objetoJSON = JSON.stringify(objeto);
+        let resposta = await fetch(rotaEspecifica, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: objetoJSON //JSON com novos valores de dados.
+        })
+        resposta = await resposta.json();
+        return resposta //Retorna a resposta do método PUT.
+    }
+    catch (erro) {
+        console.error(`Falha na requisição: ${erro.message || erro}`)
+    }
+};
 ```
 
 ### Método Fetch/DELETE
 ```javascript
+async function DELETE(rotaEspecifica) {
+    try{
+        let resposta = await fetch(rotaEspecifica, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        resposta = await resposta.json();
+        return resposta
+    }
+    catch (erro) {
+        console.error(`Falha na requisição: ${erro.message || erro}`)
+    }
+};
 ```
