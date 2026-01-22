@@ -1,4 +1,8 @@
 # Criando um projeto Express
+O Express é um framework web para Node.js que facilita e acelera a criação de aplicativos e APIs back-end, 
+oferecendo recursos como roteamento, tratamento de requisições HTTP e middleware. Ele funciona como uma camada de 
+abstração sobre o Node.js, que é o ambiente de runtime que executa JavaScript no servidor.
+
 ## 1. Verificando o ambiente do projeto
 Para iniciar um projeto Express é necessario primeiro verificar se o ```Node.js``` e o ```NPM``` (Node Package Manager) 
 estão instalados e sua versão.
