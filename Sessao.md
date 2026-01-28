@@ -47,4 +47,54 @@ Como funciona
 - Requisições subsequentes: O navegador envia o cookie de volta com cada requisição.
 - req.session: O middleware usa o ID para carregar os dados da sessão (armazenados no servidor) no objeto req.session para você usar nas suas rotas.
 - Segurança: Em produção, configure `cookie: { secure: true, httpOnly: true, sameSite: 'strict' }` para proteger contra ataques. 
-Com esses passos, você implementa sessões para rastrear usuários e gerenciar o estado do login em sua aplicação Express. 
+Com esses passos, você implementa sessões para rastrear usuários e gerenciar o estado do login em sua aplicação Express.
+
+```js
+const express = require('express');
+const session = require('express-session');
+const app = express();
+
+app.use(express.urlencoded({ extended: true }));
+
+// 1. Configuração do Middleware de Sessão
+app.use(session({
+  secret: 'sua_chave_secreta', // Substitua por uma string segura
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // Defina como true se usar HTTPS
+}));
+
+// 2. Rota de Login
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  // Valide usuário/senha aqui
+  if (username === 'usuario' && password === '123') {
+    req.session.user = username; // Cria a sessão [2]
+    res.send('Login bem-sucedido');
+  } else {
+    res.status(401).send('Credenciais inválidas');
+  }
+});
+
+// 3. Rota Protegida (Exemplo)
+app.get('/dashboard', (req, res) => {
+  if (req.session.user) {
+    res.send(`Olá ${req.session.user}, bem-vindo!`);
+  } else {
+    res.status(401).send('Não autorizado');
+  }
+});
+
+// 4. Rota de Logout
+app.post('/logout', (req, res) => {
+  req.session.destroy((err) => { // Destrói a sessão [5]
+    if (err) {
+      return res.send('Erro ao sair');
+    }
+    res.clearCookie('connect.sid'); // Limpa o cookie da sessão
+    res.send('Logout realizado com sucesso');
+  });
+});
+
+app.listen(3000, () => console.log('Servidor rodando na porta 3000'));
+```
