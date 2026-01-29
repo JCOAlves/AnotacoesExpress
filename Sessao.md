@@ -16,30 +16,53 @@ compras e preferências personalizadas, usando o middleware `express-session` pa
 
     // Configuração do middleware de sessão
     app.use(session({
-        secret: 'uma-chave-secreta-muito-segura', // Essencial para assinar o cookie
+        name: 'connect.sid', // Nome do cookie
+        secret: 'uma-chave-secreta-muito-segura', // Essencial para assinar o cookie. Substitua por uma string segura
         resave: true, // Salva a sessão mesmo se não modificada
         saveUninitialized: true, // Salva sessão para usuários não logados
-        cookie: { secure: true } // Em produção, use secure: true e HTTPOnly
+        cookie: { secure: true } // Em produção, use secure: true e HTTPOnly. Defina como true se usar HTTPS
     }));
 
-    // Exemplo de rota para usar a sessão
+    // 1. Exemplo de rota para usar a sessão
     app.get('/', (req, res) => {
         // Se a sessão 'views' não existir, inicia com 0, senão, incrementa
         req.session.views = (req.session.views || 0) + 1;
         res.send(`Você visitou esta página ${req.session.views} vezes.`);
     });
 
-    // Exemplo de rota para fazer logout (destruir a sessão)
-    app.get('/logout', (req, res) => {
-        req.session.destroy(() => { // Destrói a sessão
-            res.redirect('/'); // Redireciona para a home
-        });
+    // 2. Rota de Login
+    app.post('/login', (req, res) => {
+      const { username, password } = req.body;
+      // Valide usuário/senha aqui
+      if (username === 'usuario' && password === '123') {
+        req.session.user = username; // Cria a sessão [2]
+        res.send('Login bem-sucedido');
+      } else {
+        res.status(401).send('Credenciais inválidas');
+      }
     });
 
-    app.listen(3000, () => {
-        console.log('Servidor rodando na porta 3000');
-    });'
+    // 3. Rota Protegida (Exemplo)
+    app.get('/dashboard', (req, res) => {
+      if (req.session.user) {
+        res.send(`Olá ${req.session.user}, bem-vindo!`);
+      } else {
+        res.status(401).send('Não autorizado');
+      }
+    });
 
+    // 4. Rota de Logout
+    app.post('/logout', (req, res) => {
+      req.session.destroy((err) => { // Destrói a sessão [5]
+        if (err) {
+          return res.send('Erro ao sair');
+        }
+        res.clearCookie('connect.sid'); // Limpa o cookie da sessão
+        res.send('Logout realizado com sucesso');
+      });
+    });
+
+    app.listen(3000, () => console.log('Servidor rodando na porta 3000'));
     ```
 
 Como funciona
@@ -49,52 +72,3 @@ Como funciona
 - Segurança: Em produção, configure `cookie: { secure: true, httpOnly: true, sameSite: 'strict' }` para proteger contra ataques. 
 Com esses passos, você implementa sessões para rastrear usuários e gerenciar o estado do login em sua aplicação Express.
 
-```js
-const express = require('express');
-const session = require('express-session');
-const app = express();
-
-app.use(express.urlencoded({ extended: true }));
-
-// 1. Configuração do Middleware de Sessão
-app.use(session({
-  secret: 'sua_chave_secreta', // Substitua por uma string segura
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false } // Defina como true se usar HTTPS
-}));
-
-// 2. Rota de Login
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  // Valide usuário/senha aqui
-  if (username === 'usuario' && password === '123') {
-    req.session.user = username; // Cria a sessão [2]
-    res.send('Login bem-sucedido');
-  } else {
-    res.status(401).send('Credenciais inválidas');
-  }
-});
-
-// 3. Rota Protegida (Exemplo)
-app.get('/dashboard', (req, res) => {
-  if (req.session.user) {
-    res.send(`Olá ${req.session.user}, bem-vindo!`);
-  } else {
-    res.status(401).send('Não autorizado');
-  }
-});
-
-// 4. Rota de Logout
-app.post('/logout', (req, res) => {
-  req.session.destroy((err) => { // Destrói a sessão [5]
-    if (err) {
-      return res.send('Erro ao sair');
-    }
-    res.clearCookie('connect.sid'); // Limpa o cookie da sessão
-    res.send('Logout realizado com sucesso');
-  });
-});
-
-app.listen(3000, () => console.log('Servidor rodando na porta 3000'));
-```

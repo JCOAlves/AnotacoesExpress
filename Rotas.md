@@ -25,7 +25,13 @@ module.exports = router;
 ```
 
 ## 2. Usando parâmetros em Rotas
-Para utilizamos parâmetros em rotas utilizamos ```params``` para acessar parâmentros na rota da requisição (`req`).
+No Express.js usamos parâmetros nas rotas para funcionalidades específicas, como buscar um item pelo ID.
+Como isso, acessamos os parâmetro por meiuo da requisição (`req`) e utilizamos os **Parâmetros de Rota** (`req.params`)
+e os **Parâmetros de Consulta** (`req.query`).
+
+### Parâmetros de Rota
+São usados quando a informação é obrigatória para a rota funcionar (ex: buscar um item pelo ID). 
+Eles são definidos com dois pontos (:) na definição da rota.
 ```JavaScript
 const express = require('express');
 const router = express.Router();
@@ -46,25 +52,23 @@ router.get('/ola/:nome/:sobrenome', function(req, res) {
 
 module.exports = router;
 ```
-Também podemos utilizar o ```query``` para acessar mais de uma parâmetro na URL, desde que comece com "?" e os parâmetros sejam separados por "&".
+
+### Parâmetros de Consulta
+São usados para informações opcionais ou para filtrar resultados. Não precisam ser definidos na estrutura da rota e começam após um ?.
 ```JavaScript
 const express = require('express');
 const router = express.Router();
 
-/* Outras rotas definidas anteriormente... */
-/* Rota "imc" com vários parâmetros: localhost:3000/imc/?peso=88&estatura=1.82 */
-router.get('/imc', function(req, res) {
-  let peso = req.query.peso;
-  let estatura = req.query.estatura;
-
-  let imc = peso / Math.pow(estatura, 2);
-  let msg = '<h3>Seu IMC é ' + imc.toFixed(2) + '</h3>';
-  res.send(msg);
-  //Resposta: "Seu IMC é 26.57"
+// Rota: GET /busca?q=node&pag=1
+router.get('/busca', (req, res) => {
+    const termo = req.query.q; // "node"
+    const pagina = req.query.pag; // "1"
+    res.send(`Resultados para: ${termo} na página ${pagina}`);
 });
 
 module.exports = router;
 ```
+
 ## 3. Enviando resposta de requisições
 No Express, o objeto de resposta (`res`) oferece diversos métodos para enviar dados de volta ao cliente e finalizar o ciclo de requisição-resposta.
 Entre os principais métodos de resposta estão:
@@ -82,92 +86,36 @@ Entre os principais métodos de resposta estão:
 - `res.end()`: Finaliza o processo de resposta manualmente sem enviar nenhum dado no corpo, útil para respostas vazias. 
 
 ```js
-app.get('/api/user', (req, res) => {
+router.get('/api/user', (req, res) => {
   // Define status 200 e envia JSON
   res.status(200).json({ id: 1, name: 'João' });
 });
 
-app.get('/error', (req, res) => {
+router.get('/error', (req, res) => {
   // Define status 404 e envia mensagem
   res.status(404).send('Página não encontrada');
 });
 
-app.get('/error', (req, res) => {
+router.get('/error', (req, res) => {
   // Define status 500 e envia "Internal Server Error"
   res.sendStatus(500);
 });
 
-app.get('/perfil', (req, res) => {
+router.get('/perfil', (req, res) => {
   // Renderiza template engine (EJS, Pug, etc)
   res.render('perfil', { usuario: 'Maria' });
 });
 
-app.get('/imagem', (req, res) => {
+router.get('/imagem', (req, res) => {
   // Envia arquivo
   res.sendFile(__dirname + '/foto.png');
 });
 
-app.get('/antiga-rota', (req, res) => {
+router.get('/antiga-rota', (req, res) => {
   // Redireciona para uma noba rota
   res.redirect('/nova-rota');
 });
 ```
-
-
-
-
-No Express.js, tanto os parâmetros de rota (route params) quanto os de consulta (query params) são formas de passar informações pela URL, mas diferem no uso, estrutura e obrigatoriedade. 
-Parâmetros de Rota (req.params): Identificam recursos específicos (ex: um ID de usuário) e fazem parte da estrutura da URL.
-Parâmetros de Consulta (req.query): Filtram, ordenam ou paginam resultados. São opcionais e vêm após o ? na URL. 
-1. Parâmetros de Rota (req.params)
-São usados quando a informação é obrigatória para a rota funcionar (ex: buscar um item pelo ID). Eles são definidos com dois pontos (:) na definição da rota. 
-Formato URL: /usuarios/123
-Definição no Express: app.get('/usuarios/:id', ...)
-Acesso no Código: req.params.id 
-Exemplo de uso:
-javascript
-// Rota: GET /usuarios/42
-app.get('/usuarios/:id', (req, res) => {
-    const usuarioId = req.params.id; // "42"
-    res.send(`Detalhes do usuário: ${usuarioId}`);
-});
-2. Parâmetros de Consulta (req.query)
-São usados para informações opcionais ou para filtrar resultados. Não precisam ser definidos na estrutura da rota e começam após um ?. 
-Formato URL: /produtos?ordem=preco&limite=10
-Definição no Express: app.get('/produtos', ...)
-Acesso no Código: req.query.nomeDoParametro
-Exemplo de uso:
-javascript
-// Rota: GET /busca?q=node&pag=1
-app.get('/busca', (req, res) => {
-    const termo = req.query.q; // "node"
-    const pagina = req.query.pag; // "1"
-    res.send(`Resultados para: ${termo} na página ${pagina}`);
-});
-Diferenças Principais
-Característica 	Parâmetros de Rota (req.params)	Parâmetros de Consulta (req.query)
-Uso Principal	Identificar um recurso único (ID).	Filtrar, ordenar, paginação.
-Estrutura	Obrigatórios na URL (/item/:id).	Opcionais, após ? (/item?id=1).
-Acesso	req.params.nome	req.query.nome
-Exemplo URL	/users/10	/users?id=10
-Obrigatoriedade	Sim, a rota não é encontrada sem eles.	Não, a rota funciona sem eles.
-Quando usar qual?
-Use req.params (Rota): Quando o dado for fundamental para encontrar o recurso, como GET /api/livros/15 ou DELETE /api/produtos/5.
-Use req.query (Consulta): Quando for alterar a exibição, como GET /api/livros?genero=fantasia&ordenar=mais-vendidos. 
-Resumo prático
-javascript
-// GET /users/100?tab=profile
-
-app.get('/users/:id', (req, res) => {
-  // 1. O parâmetro de rota (ID do usuário)
-  const userId = req.params.id; // "100"
-  
-  // 2. O parâmetro de consulta (tab ativa)
-  const tab = req.query.tab; // "profile"
-  
-  res.send(`Usuário: ${userId}, Tab: ${tab}`);
-});
-
 
 
 
