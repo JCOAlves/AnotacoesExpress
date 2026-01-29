@@ -116,6 +116,58 @@ app.get('/antiga-rota', (req, res) => {
 
 
 
+No Express.js, tanto os parâmetros de rota (route params) quanto os de consulta (query params) são formas de passar informações pela URL, mas diferem no uso, estrutura e obrigatoriedade. 
+Parâmetros de Rota (req.params): Identificam recursos específicos (ex: um ID de usuário) e fazem parte da estrutura da URL.
+Parâmetros de Consulta (req.query): Filtram, ordenam ou paginam resultados. São opcionais e vêm após o ? na URL. 
+1. Parâmetros de Rota (req.params)
+São usados quando a informação é obrigatória para a rota funcionar (ex: buscar um item pelo ID). Eles são definidos com dois pontos (:) na definição da rota. 
+Formato URL: /usuarios/123
+Definição no Express: app.get('/usuarios/:id', ...)
+Acesso no Código: req.params.id 
+Exemplo de uso:
+javascript
+// Rota: GET /usuarios/42
+app.get('/usuarios/:id', (req, res) => {
+    const usuarioId = req.params.id; // "42"
+    res.send(`Detalhes do usuário: ${usuarioId}`);
+});
+2. Parâmetros de Consulta (req.query)
+São usados para informações opcionais ou para filtrar resultados. Não precisam ser definidos na estrutura da rota e começam após um ?. 
+Formato URL: /produtos?ordem=preco&limite=10
+Definição no Express: app.get('/produtos', ...)
+Acesso no Código: req.query.nomeDoParametro
+Exemplo de uso:
+javascript
+// Rota: GET /busca?q=node&pag=1
+app.get('/busca', (req, res) => {
+    const termo = req.query.q; // "node"
+    const pagina = req.query.pag; // "1"
+    res.send(`Resultados para: ${termo} na página ${pagina}`);
+});
+Diferenças Principais
+Característica 	Parâmetros de Rota (req.params)	Parâmetros de Consulta (req.query)
+Uso Principal	Identificar um recurso único (ID).	Filtrar, ordenar, paginação.
+Estrutura	Obrigatórios na URL (/item/:id).	Opcionais, após ? (/item?id=1).
+Acesso	req.params.nome	req.query.nome
+Exemplo URL	/users/10	/users?id=10
+Obrigatoriedade	Sim, a rota não é encontrada sem eles.	Não, a rota funciona sem eles.
+Quando usar qual?
+Use req.params (Rota): Quando o dado for fundamental para encontrar o recurso, como GET /api/livros/15 ou DELETE /api/produtos/5.
+Use req.query (Consulta): Quando for alterar a exibição, como GET /api/livros?genero=fantasia&ordenar=mais-vendidos. 
+Resumo prático
+javascript
+// GET /users/100?tab=profile
+
+app.get('/users/:id', (req, res) => {
+  // 1. O parâmetro de rota (ID do usuário)
+  const userId = req.params.id; // "100"
+  
+  // 2. O parâmetro de consulta (tab ativa)
+  const tab = req.query.tab; // "profile"
+  
+  res.send(`Usuário: ${userId}, Tab: ${tab}`);
+});
+
 
 
 
