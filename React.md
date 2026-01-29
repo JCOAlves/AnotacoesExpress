@@ -59,3 +59,36 @@ ss navegadores utilizam o **CORS** (Cross-Origin Resource Sharing), que é um me
         res.json({ msg: 'Esta rota tem CORS específico' });
     });
     ```
+## 2. Usando `session` com React e Express
+Para utilizar sessões com React e Express, você precisa entender que o React não "guarda" a sessão; 
+quem faz isso é o **Navegador** através de um Cookie, e o servidor Express apenas reconhece esse cookie.
+Para utilizar o session você precisa configurar o backend e o frontend:
+
+1. Configuração no Backend (Express)
+    ```js
+    // No app.js
+    app.use(cors({
+        origin: 'http://localhost:5173', // URL do seu React
+        credentials: true                // PERMITE enviar cookies/sessão
+    }));
+
+    app.use(session({
+        name: 'sistemaWeb', 
+        secret: 'sua_chave_secreta',
+        resave: false,
+        saveUninitialized: false,
+        cookie: { 
+            secure: false,    // Mantenha FALSE no localhost
+            httpOnly: true,   // Segurança: impede que o JS do front leia o cookie
+            sameSite: 'lax'   // Necessário para navegadores modernos
+        }
+    }));
+    ```
+
+2. Configuração no Frontend (React)
+    Se você usar o `fetch` comum, o navegador vai bloquear o cookie por segurança.
+    Você precisa avisar ao Axios que ele deve incluir as "credenciais" em todas as chamadas.
+    ```js
+    ```
+
+
