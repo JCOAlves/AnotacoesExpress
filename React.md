@@ -87,8 +87,79 @@ Para utilizar o session você precisa configurar o backend e o frontend:
 
 2. Configuração no Frontend (React)
     Se você usar o `fetch` comum, o navegador vai bloquear o cookie por segurança.
-    Você precisa avisar ao Axios que ele deve incluir as "credenciais" em todas as chamadas.
+    Você precisa avisar ao fecth que ele deve incluir as "credenciais" em todas as chamadas.
     ```js
+    //Metodo GET
+    async function GET(rota){ 
+        try { 
+            let resposta = await fetch(rota, {credentials: 'include'}); // Permite que o navegador pegue cookies de sessão
+            const dados = await resposta.json();
+            if("mensagemServidor" in dados){
+                return dados["mensagemServidor"];
+            }else{
+                return dados;
+            }
+    
+        } catch (error) {
+            console.error(`Erro na busca de dados: ${error.message || error}`);
+            return `Erro na busca de dados: ${error.message || error}`;
+        }
+    };
+    
+    //Metodo POST
+    async function POST(rota, objeto) {
+        try {
+            const objetoJSON = JSON.stringify(objeto);
+            let resposta = await fetch(rota, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: objetoJSON,
+                credentials: 'include' // Permite que o navegador envie cookies de sessão
+            });
+            resposta = await resposta.json();
+            return resposta;
+        }
+        catch (error) {
+            console.error(`Erro no envio de dados: ${error.message || error}`);
+            return `Erro no envio de dados: ${error.message || error}`;
+        }
+    };
+    
+    //Metodo PUT
+    async function PUT(rotaEspecifica, objeto) {
+        try{
+            const objetoJSON = JSON.stringify(objeto);
+            let resposta = await fetch(rotaEspecifica, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: objetoJSON,
+                credentials: 'include' // Permite que o navegador envie cookies de sessão
+            });
+            resposta = await resposta.json();
+            return resposta;
+        }
+        catch(error){
+            console.error(`Erro na atualização de dados: ${error.message || error}`);
+            return `Erro na atualização de dados: ${error.message || error}`;
+        }
+    };
+    
+    //Metedo DELETE
+    async function DELETE(rotaEspecifica) {
+        try{
+            let resposta = await fetch(rotaEspecifica, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include' // Permite que o navegador envie cookies de sessão
+            });
+            resposta = await resposta.json();
+            return resposta;
+        }
+        catch(error){
+            console.error(`Erro na excluição de dados: ${error.message || error}`);
+            return `Erro na excluição de dados: ${error.message || error}`;
+        }
+    };
     ```
 
 
