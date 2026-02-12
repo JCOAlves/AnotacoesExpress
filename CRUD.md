@@ -3,31 +3,6 @@ Funções CRUD (Create, Read, Update e Delete) são um conjunto de função em
 que você pode listar, criar, atualizar e deleatar itens de um projeto.
 Dessa forma, vamos adicionar essas funcionalidade ao projeto.
 
-## 1. Instalação do módulo `Nodemon`
-Antes de imprementar as funções CRUD, nos devemos instalar o módulo `Nodemon`. O Nodemon reinicia, automaticamente, 
-o aplicativo quando são detectadas alterações em arquivos, visto que anteriomente era necessario desligar e ligar novamente 
-os arquivos para que as mudanças nos scripts sejam detectadas. Com isso, para instala-lo, use o comanda a seguir no terminal, 
-dentro da pasta do projeto:
-
-- Instalação: Recomenda-se instalá-lo como dependência de desenvolvimento:
-  ```bash
-  npm install --save-dev nodemon
-  ```
-- Como usar:
-  1. No arquivo package.json, adicione um script na seção "scripts". Recomendo manter o comando `start` original e criar um novo chamado `dev`:
-    ```json
-    "scripts": {
-        "start": "node ./bin/www",
-        "dev": "nodemon ./bin/www"
-    },
-    ```
-    Se quiser garantir que ele monitore também arquivos .json ou extensões de visualização como .ejs, você pode usar: `"dev": "nodemon ./bin/www -e js,json,ejs"`
-
-  2. Agora para rodar o projeto, em vez de usar `npm start`, você usará o comando abaixo no seu terminal:
-     ```bash
-     npm run dev
-     ```
-
 ## 2. Criando funções CRUD nas rotas
 ### Criar dados (Create)
 ```javascript
@@ -62,7 +37,7 @@ router.post('/add', function(req, res) {
 ```javascript
 router.get('/add', function(req, res) {
     res.render('autores-add', {resultado: {}})
-};
+});
 
 /* Rota para obter os dados atuais do autor*/
 router.get('/edit/:id', function(req, res) {

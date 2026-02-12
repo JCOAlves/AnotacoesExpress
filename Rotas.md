@@ -4,24 +4,29 @@ Elas associam um endereço (URL) a uma função específica, como a exibição d
 Isso permite que a aplicação responda a diferentes URLs sem que cada uma corresponda diretamente a um arquivo estático no servidor. 
 
 ## 1. Criando rotas
-Para criar rotas no express usamos o objeto `router` para gerar a rota, que conta como parâmetros 
+Para criar rotas no express usamos o objeto `app` para gerar a rota, que conta como parâmetros 
 o nome da rota e um função inline que trata e gerencia as requsições (`req`) e respostas (`res`) à rota.
 ```JavaScript
-const express = require('express');
-const router = express.Router();
+import express from "express";
+const app = express();
 
-/* Rota principal usando a view index.ejs. */
-router.get('/', function(req, res, next) {
-res.render('index', { title: 'Express' });
-});
+// PORT armazena o número da porta que vai rodar o servidor.
+const PORT = process.env.PORT || 3000;
+
+/* Rota principal usando um index.ejs. */
+app.get('/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
+}); // A mensagem será renderizada no arquivo .ejs
 
 /* Rota “sobre” sem usar uma view. */
-router.get('/sobre', function(req, res) {
-let msg = '<h2>Sobre Rotas...</h2>';
-res.send(msg);
+app.get('/sobre', function(req, res) {
+  let msg = '<h2>Sobre Rotas...</h2>';
+  res.send(msg);
 });
 
-module.exports = router;
+app.listen(PORT, () => {
+    console.log(`Rodando na porta ${PORT}.`);
+});
 ```
 
 ## 2. Usando parâmetros em Rotas
@@ -33,40 +38,48 @@ e os **Parâmetros de Consulta** (`req.query`).
 São usados quando a informação é obrigatória para a rota funcionar (ex: buscar um item pelo ID). 
 Eles são definidos com dois pontos (:) na definição da rota.
 ```JavaScript
-const express = require('express');
-const router = express.Router();
+import express from "express";
+const app = express();
+
+const PORT = process.env.PORT || 3000;
 
 /* Outras rotas definidas anteriormente... */
 
 /* Rota usando 1 parâmetro enviado na URL. */
-router.get('/ola/:nome', function(req, res) {
+app.get('/ola/:nome', function(req, res) {
   let msg = '<h2>Olá, ' + req.params.nome + '!</h2>';
   res.send(msg);
 });
 
 /*Podemos adicionar mais de um parâmetro na rota, mas é necessario separar os parâmetros por barras.*/
-router.get('/ola/:nome/:sobrenome', function(req, res) {
+app.get('/ola/:nome/:sobrenome', function(req, res) {
   let msg = '<h2>Olá, ' + req.params.nome + " " + req.params.sobrenome + '!</h2>';
   res.send(msg);
 });
 
-module.exports = router;
+app.listen(PORT, () => {
+    console.log(`Rodando na porta ${PORT}.`);
+});
 ```
 
 ### Parâmetros de Consulta
 São usados para informações opcionais ou para filtrar resultados. Não precisam ser definidos na estrutura da rota e começam após um ?.
 ```JavaScript
-const express = require('express');
-const router = express.Router();
+import express from "express";
+const app = express();
+
+const PORT = process.env.PORT || 3000;
 
 // Rota: GET /busca?q=node&pag=1
-router.get('/busca', (req, res) => {
+app.get('/busca', (req, res) => {
     const termo = req.query.q; // "node"
     const pagina = req.query.pag; // "1"
     res.send(`Resultados para: ${termo} na página ${pagina}`);
 });
 
-module.exports = router;
+app.listen(PORT, () => {
+    console.log(`Rodando na porta ${PORT}.`);
+});
 ```
 
 ## 3. Enviando resposta de requisições
@@ -86,34 +99,43 @@ Entre os principais métodos de resposta estão:
 - `res.end()`: Finaliza o processo de resposta manualmente sem enviar nenhum dado no corpo, útil para respostas vazias. 
 
 ```js
-router.get('/api/user', (req, res) => {
+import express from "express";
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+
+app.get('/api/user', (req, res) => {
   // Define status 200 e envia JSON
   res.status(200).json({ id: 1, name: 'João' });
 });
 
-router.get('/error', (req, res) => {
+app.get('/error', (req, res) => {
   // Define status 404 e envia mensagem
   res.status(404).send('Página não encontrada');
 });
 
-router.get('/error', (req, res) => {
+app.get('/error', (req, res) => {
   // Define status 500 e envia "Internal Server Error"
   res.sendStatus(500);
 });
 
-router.get('/perfil', (req, res) => {
+app.get('/perfil', (req, res) => {
   // Renderiza template engine (EJS, Pug, etc)
   res.render('perfil', { usuario: 'Maria' });
 });
 
-router.get('/imagem', (req, res) => {
+app.get('/imagem', (req, res) => {
   // Envia arquivo
   res.sendFile(__dirname + '/foto.png');
 });
 
-router.get('/antiga-rota', (req, res) => {
+app.get('/antiga-rota', (req, res) => {
   // Redireciona para uma noba rota
   res.redirect('/nova-rota');
+});
+
+app.listen(PORT, () => {
+    console.log(`Rodando na porta ${PORT}.`);
 });
 ```
 
