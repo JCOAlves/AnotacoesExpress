@@ -5,51 +5,68 @@ O banco de dados MySQL é onde estão armazenados os dados de uma aplicação. P
 1. Inicialize o servidor MySQL.
 2. Na pasta do projeto, instale o pacote MySQL:
    ```bash
-   npm install --save mysql
+   npm install mysql2
    ```
+   O `mysql2` garante que sua aplicação seja resiliente e escalável. Para isso, usa o **Connection Pool** (Piscina de Conexões), que diferente de uma conexão única (que pode cair ou ficar ocupada), mantém várias conexões abertas e as "empresta" conforme as requisições chegam, devolvendo-as automaticamente depois.
 3. Na pasta do projeto, crie uma subpasta chamada ```utils```.
-4. Na sequência, dentro da subpasta ```utils```, crie um arquivo chamado ```db.js```:
+4. Por motivos de sergurança nós não colocamos os dados de conexão do banco direto no código. Com isso, criamos um arquivo `.env` para armazenar dados da conexão, a qual deve ser ignorado no commit para o GitHub. Para usar o `.env`, instalamos a a depedência `dotenv` para acessar os dados:
+   ```bash
+   npm install dotenv
+   ```
+   ```bash
+   DB_HOST=127.0.0.1
+   DB_USER=root
+   DB_PASS=sua_senha_secreta
+   DB_NAME=restaurante_db
+   DB_PORT=3306
+   ```
+5. Na sequência, dentro da subpasta ```utils```, crie um arquivo chamado ```db.js```:
    ```javascript
-   const mysql = require('mysql');
-   const db = mysql.createConnection({
-       host: 'localhost', //Maquina onde se localiza o banco
-       user: 'root', //Nome de usuario do MySQL
-       password: '', //Senha da conta MySQL
-       port: 3306, //Porta logica onde corre o MySQL 
-       database: 'dbbiblioteca', //Nome do banco de dados
-       multipleStatements: true
+   import mysql from 'mysql2/promise';
+   import dotenv from 'dotenv';
+
+   dotenv.config(); // Acessa as credenciais do .env
+
+   // Criamos o pool de conexões
+   const pool = mysql.createPool({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
+      port: process.env.DB_PORT,
+      waitForConnections: true,
+      connectionLimit: 10, // Máximo de 10 conexões simultâneas
+      queueLimit: 0
    });
 
-   db.connect(function(erro) {
-     if (erro){
-        throw erro;
-     }
-     console.log('Conectado ao BD...');
-   });
-   
-   global.db = db;
-   module.exports = db;
+   // Teste rápido de conexão ao iniciar
+   try {
+      const connection = await pool.getConnection();
+      console.log("Banco de dados MySQL conectado com sucesso!");
+      connection.release(); // Importante: devolve a conexão para o pool
+   } catch (error) {
+      console.error("Erro ao conectar ao banco de dados:", error.message);
+   }
+
+   export default pool;
    ```
-   **ATENÇÃO:** Por motivos de sergurança nós não subimos para o GitHub os dados de conexão do banco, pois permite a invasoes de usuaários mal-intencionados. Com isso, criamos um arquivo `.env` para armazenar dados da conexão, a qual deve ser ignorado no commit para o GitHub.
 
 ## 2. Retornando dados do banco
 Para retornamos os dados do banco utilizamos o objeto da conexão `db`.
 ```javascript
-let express = require('express');
-let router = express.Router();
-let db = require('../utils/db');
+import express from "express";
+let app = express();
+import db from '../utils/db.js';
 
 /* Outras rotas definidas anteriormente... */
-router.get('/autores/listar', function(req, res) {
-   db.query('SELECT * FROM TbAutor', [], function(erro, listagem){
+app.get('/autores/listar', async function(req, res) {
+   await db.query('SELECT * FROM TbAutor', [], async function(erro, listagem){
       if (erro){
          res.send(erro);
       }
       res.send(listagem);
    });
 });
-
-module.exports = router;
 ```
 - **`let db = require('../utils/db');`**: Importação do objeto da conexão MySQL
 - **`router.get`**: Método GET HTTP
@@ -61,15 +78,15 @@ module.exports = router;
 - **`res.send(listagem)`**: Retorna uma lista com os dados do banco MySQL em formato JSON.
 
 ## 3. Exibição dos dados
-Não podemos exibir os dados da aplicação de forma bruta, então nos renderizamos os dados em arquivos HTML para a visualização do usuário. Aqui podemos exibir os dados no `ejs`, que são arquivos de template que permitem incorporar código JavaScript diretamente em HTML para criar páginas web dinâmicas no lado do servidor, localizado na pasta `views`.
+Para exibir os dados do banco, podemos exibi-los no terminal ou em uma página HTML, enviando por `JSON` ou renderizando em um arquivo `ejs`, que são arquivos de template que permitem incorporar código JavaScript diretamente em HTML para criar páginas web dinâmicas no lado do servidor`.
 ```javascript
-/* Lembrar das declarações: let express ... let db... let router... */
-router.get('/autores/listar', function(req, res) {
+/* Lembrar das declarações: let express ... let db... let app... */
+app.get('/autores/listar', async function(req, res) {
    let cmd = 'SELECT IdAutor, NoAutor, NoNacionalidade ';
    cmd += ' FROM TbAutor AS a INNER JOIN TbNacionalidade AS n';
    cmd += ' ON a.IdNacionalidade = n.IdNacionalidade';
    cmd += ' ORDER BY NoAutor';
-   db.query(cmd, [], function(erro, listagem){
+   await db.query(cmd, [], function(erro, listagem){
       if (erro){
          res.send(erro);
       }
@@ -78,8 +95,6 @@ router.get('/autores/listar', function(req, res) {
       res.render('autores-lista', {resultado: listagem});
    });
 });
-
-module.exports = router;
 ```
 ```ejs
 <!DOCTYPE html>

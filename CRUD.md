@@ -7,13 +7,13 @@ Dessa forma, vamos adicionar essas funcionalidade ao projeto.
 ### Criar dados (Create)
 ```javascript
 /* Rota para incluir dados de autor*/
-router.post('/add', function(req, res) {
+router.post('/add', async function(req, res) {
     //É no body que estão os dados passados na requisição.
     let nome = req.body.nome;
     let nacionalidade = req.body.nacionalidade;
 
     let cmd = "INSERT INTO TbAutor (NoAutor, IdNacionalidade) VALUES (?, ?);";
-    db.query(cmd, [nome, nacionalidade], function(erro){
+    await db.query(cmd, [nome, nacionalidade], async function(erro){
         if (erro){
             //Envia erro
             res.send(erro);
@@ -35,16 +35,16 @@ router.post('/add', function(req, res) {
 
 ### Listar dados (Read)
 ```javascript
-router.get('/add', function(req, res) {
+router.get('/add', async function(req, res) {
     res.render('autores-add', {resultado: {}})
 });
 
 /* Rota para obter os dados atuais do autor*/
-router.get('/edit/:id', function(req, res) {
+router.get('/edit/:id', async function(req, res) {
     let id = req.params.id;
     let cmd = "SELECT * FROM TbAutor WHERE IdAutor = ?;";
 
-    db.query(cmd, [id], function(erro, listagem){
+    await db.query(cmd, [id], async function(erro, listagem){
         if (erro){
             res.send(erro);
         }
@@ -57,18 +57,18 @@ router.get('/edit/:id', function(req, res) {
 - **`SELECT * FROM TbAutor`**: Comando SQL para selecionar dados da tabela que vão ser exibidos.
 - **`WHERE IdAutor`**: Condicional para os dados que vão ou não ser exibidos.
 - **`[id]`**: Lista com as variaveis parâmetros, sendo utilizada para identificar um dado espefico.
-- **`res.render`**: Função que renderiza os dados no arquivo `.ejs`.
+- **`res.render`**: Função que renderiza os dados no `.ejs`.
 
 ### Atualizar dados (Update)
 ```javascript
 /* Rota para alterar dados de autor*/
-router.put('/edit/:id', function(req, res) {
+router.put('/edit/:id', async function(req, res) {
     let id = req.params.id; //Parâmetro da rota com o identicidor (id)
     let nome = req.body.nome; //É no body que estão os dados passados na requisição.
     let nacionalidade = req.body.nacionalidade;
 
     let cmd = "UPDATE TbAutor SET NoAutor = ?, IdNacionalidade = ? WHERE IdAutor = ?;";
-    db.query(cmd, [nome, nacionalidade, id], function(erro, listagem){
+    await db.query(cmd, [nome, nacionalidade, id], async function(erro, listagem){
         if (erro){
             res.send(erro);
         }
@@ -88,10 +88,10 @@ router.put('/edit/:id', function(req, res) {
 ### Deletar dados (Delete)
 ```javascript
 /*Rota para excluir dados de autor*/
-router.delete('/delete/:id', function(req, res) {
+router.delete('/delete/:id', async function(req, res) {
     let id = req.params.id; //Recupera parâmentro id da rota
     let cmd = "DELETE FROM TbAutor WHERE IdAutor = ?;";
-    db.query(cmd, [id], function(erro, listagem){
+    await db.query(cmd, [id], async function(erro, listagem){
         if (erro){
             res.send(erro);
         }

@@ -6,19 +6,23 @@ Visto isso, é uma boa pratica dividir e agrupa rotas em arquivos separados, seg
 Uma boa forma de agrupar rotas é de acordo com sua funcionalidade e os tipos de dados que manipulam. 
 Um exemplo disso são rotas sobre autores de livros, em que listam e registram autores, manipulando assim os métodos
 `GET` e `POST`. Assim, as rotas são arquivadas em um único arquivo. E esses arquivos são guardados em uma subpasta no projeto, 
-podendo ser chamada de `Routes`.
+podendo ser chamada de `Routes`. Em aplicações maiores, é comum modularizar ainda mais usando o objeto Router do Express.
 
 ```javascript
-let express = require('express');
-let db = require('../utils/db')
-let router = express.Router();
+//Arquivo autoresRouter.js
+import express from 'express';
+import db from '../utils/db.js';
+
+let router = express.Router(); //É usado como um "mini-aplicativo". Serve exclusivamente para organizar rotas.
+
+// Aqui definimos apenas os "sub-caminhos"
 
 //Lista autores
-router.get('/listar', function(req, res) {
+router.get('/listar', async function(req, res) {
   let cmd = 'SELECT IdAutor, NoAutor, NoNacionalidade';
   cmd += ' FROM TbAutor AS a INNER JOIN TbNacionalidade AS n';
   cmd += ' ON a.IdNacionalidade = n.IdNacionalidade ORDER BY NoAutor';
-  db.query(cmd, [], function(erro, listagem){
+  await db.query(cmd, [], async function(erro, listagem){
     if (erro){
       res.send(erro);
     }
@@ -28,78 +32,36 @@ router.get('/listar', function(req, res) {
 
 //Adicionar autores
 router.get('/add', function(req, res) {
-  res.render('autores-add')
+  res.render('autores-add');
 });
 
-module.exports = router;
+export default router;
 ```
 
 ## 2. Configurando rotas no arquivo `App.js`
-Para configurar as rotas no arquivo `App.js` nos importamos as rotas do arquivos com as rotas.
+Para configurar as rotas no arquivo principal `App.js` nos importamos as rotas do arquivos com as rotas.
 ```javascript
-let indexRouter = require('./routes/index');
-let usersRouter = require('./routes/users');
-let autoresRouter = require('./routes/autores');
+import express from 'express'
+let app = express();
+import autoresRouter from './routes/autores.js';
 
-//Chamamento das rotas.
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// Chama e aplica todas as rotas do arquivo autoresRouter sob o prefixo '/autores'
 app.use('/autores', autoresRouter);
 
-//Chamamos as rotas a partir da rota principal, que pode ser a primeira rota que aparece no arquivo.
+app.listen(3000, () => {
+  console.log('Servidor rodando na porta 3000');
+});
 ```
-Chamamos as rotas a partir da rota principal, que pode ser a primeira rota que aparece no arquivo.
+Chamamos as rotas a partir da rota principal, qual é a raiz para as outras rotas criadas.
 
 ## 3. Modulerizando funções nas rotas
 Também é uma boa pratica colocar as funções das rotas em arquivos separados. 
 A exportação e importação de funções para rotas no Express pode ser feita usando 
-a sintaxe de módulos do Node.js (`require` e `module.exports`) ou módulos ES (`import` e `export`). 
-
-### Abordagem 1: Módulos Node.js (CommonJS)
-Esta é a abordagem mais comum em projetos Express legados e funciona perfeitamente.
-
-1. Crie um arquivo para suas funções/controladores (ex: controladores/usuarioController.js):
-   ```javascript
-   // controladores/usuarioController.js
-
-   // Exemplo de função de controle para listar usuários
-   exports.listarUsuarios = (req, res) => {
-   // Lógica para buscar usuários do banco de dados, etc.
-     res.status(200).send('Lista de usuários');
-   };
-
-   // Exemplo de função de controle para obter um único usuário
-   exports.obterUsuario = (req, res) => {
-     const userId = req.params.id;
-     // Lógica para buscar um usuário específico
-     res.status(200).send(`Detalhes do usuário ${userId}`);
-   };
-   ```
-   
-2. Importe e use as funções no seu arquivo de rotas (ex: app.js ou rotas/usuarioRotas.js):
-   ```javascript
-   // app.js (ou arquivo principal)
-
-   const express = require('express');
-   const app = express();
-   const usuarioController = require('./controladores/usuarioController');
-
-   // Define as rotas usando as funções importadas
-   app.get('/usuarios', usuarioController.listarUsuarios);
-   app.get('/usuarios/:id', usuarioController.obterUsuario);
-
-   app.listen(3000, () => {
-     console.log('Servidor rodando na porta 3000');
-   });
-   ```
-
-### Abordagem 2: Módulos ES (ES Modules)
-Esta abordagem é a sintaxe moderna do JavaScript. Para usá-la, você precisa garantir que seu projeto esteja 
-configurado para suportar módulos ES (adicionando `"type"`: `"module"` no seu package.json ou usando a extensão de arquivo `.mjs`).
+a sintaxe de módulos ES (`import` e `export`). 
 
 1. Crie o arquivo de funções usando export (ex: controladores/usuarioController.mjs):
    ```javascript
-   // controladores/usuarioController.mjs
+   // controladores/usuarioController.js
 
    // Exemplo de função de controle para listar usuários
    export const listarUsuarios = (req, res) => {
@@ -113,58 +75,32 @@ configurado para suportar módulos ES (adicionando `"type"`: `"module"` no seu p
    };
    ```
 
-2. Importe e use as funções no seu arquivo de rotas usando import (ex: app.mjs):
+2. Import as funções no arquivo das rotas usuariosRouter:
+  ```js
+  import express from 'express';
+  let router = express.Router();
+  import { listarUsuarios, obterUsuario } from './controladores/usuarioController.js';
+
+  // Define as rotas usando as funções importadas
+  router.get('/', listarUsuarios);
+  router.get('/:id', obterUsuario);
+  
+  export default router;
+  ```
+
+3. Importe e use as funções no seu arquivo de rotas usando import (ex: app.js):
    ```javascript
-   // app.mjs
+   // app.js
 
    import express from 'express';
-   import { listarUsuarios, obterUsuario } from './controladores/usuarioController.mjs';
+   import usuariosRouter from './routers/usuariosRouter.js';
 
    const app = express();
 
-   // Define as rotas usando as funções importadas
-   app.get('/usuarios', listarUsuarios);
-   app.get('/usuarios/:id', obterUsuario);
+   // Use as rotas definidas
+   app.get('/usuarios', usuariosRouter);
 
    app.listen(3000, () => {
       console.log('Servidor rodando na porta 3000');
    });
    ```
-
-### Prática Recomendada: Usando `express.Router`
-Em aplicações maiores, é comum modularizar ainda mais usando o objeto Router do Express.
-
-1. Arquivo de rotas dedicado (ex: rotas/usuarioRotas.js):
-   ```javascript
-   // rotas/usuarioRotas.js
-
-   const express = require('express');
-   const router = express.Router();
-   const usuarioController = require('../controladores/usuarioController'); // Usando CommonJS
-
-   // Define as rotas específicas para usuários
-   router.get('/', usuarioController.listarUsuarios);
-   router.get('/:id', usuarioController.obterUsuario);
-
-   module.exports = router; // Exporta o objeto router configurado
-   ```
-
-2. Arquivo principal (app.js) usando o roteador:
-   ```javascript
-   // app.js
-
-   const express = require('express');
-   const app = express();
-   const usuarioRotas = require('./rotas/usuarioRotas');
-
-   // Aplica todas as rotas do arquivo usuarioRotas sob o prefixo '/api/usuarios'
-   app.use('/api/usuarios', usuarioRotas);
-
-   app.listen(3000, () => {
-     console.log('Servidor rodando na porta 3000');
-   });
-   ```
-
-
-
-
