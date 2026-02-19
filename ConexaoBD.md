@@ -13,6 +13,7 @@ O banco de dados MySQL é onde estão armazenados os dados de uma aplicação. P
    ```bash
    npm install dotenv
    ```
+   Criamos o arquivo `.env` na raiz do projeto:
    ```bash
    DB_HOST=127.0.0.1
    DB_USER=root
