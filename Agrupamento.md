@@ -59,7 +59,7 @@ Também é uma boa pratica colocar as funções das rotas em arquivos separados.
 A exportação e importação de funções para rotas no Express pode ser feita usando 
 a sintaxe de módulos ES (`import` e `export`). 
 
-1. Crie o arquivo de funções usando export (ex: controladores/usuarioController.mjs):
+1. Crie o arquivo de funções usando export (ex: controladores/usuarioController.js):
    ```javascript
    // controladores/usuarioController.js
 
@@ -75,18 +75,18 @@ a sintaxe de módulos ES (`import` e `export`).
    };
    ```
 
-2. Import as funções no arquivo das rotas usuariosRouter:
-  ```js
-  import express from 'express';
-  let router = express.Router();
-  import { listarUsuarios, obterUsuario } from './controladores/usuarioController.js';
-
-  // Define as rotas usando as funções importadas
-  router.get('/', listarUsuarios);
-  router.get('/:id', obterUsuario);
+2. Import as funções no arquivo das rotas usuariosRouter.js:
+    ```js
+    import express from 'express';
+    let router = express.Router();
+    import { listarUsuarios, obterUsuario } from './controladores/usuarioController.js';
   
-  export default router;
-  ```
+    // Define as rotas usando as funções importadas
+    router.get('/', listarUsuarios);
+    router.get('/:id', obterUsuario);
+    
+    export default router;
+    ```
 
 3. Importe e use as funções no seu arquivo de rotas usando import (ex: app.js):
    ```javascript
