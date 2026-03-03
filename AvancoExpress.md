@@ -1,7 +1,10 @@
-# Imprementando React com Express
-React.js (ou React) é uma biblioteca JavaScript de código aberto usada para construir interfaces de usuário (UIs) interativas e reativas, dividindo-as em componentes reutilizáveis que gerenciam seu próprio estado, facilitando a criação de aplicações web complexas e de página única (SPAs) de forma eficiente. Assm, usar Express.js com React.js permite criar aplicações full-stack robustas, onde o Express atua como backend (API RESTful) gerenciando dados e regras de negócio, enquanto o React gerencia a interface do usuário no frontend. 
+# Frameworks e ferramentas de desenvolvimento em projetos Espress
+Agora que compreendemos os conceitos básicos para o desenvolvimento de projetos `Express`, 
+podemos avança e utilizar ferramentas e frameworks que nós permitem criar projetos mais complexos e modernos.
 
-## 1. Criando um *Frontend* com React.js
+## 1. Utilizando React JS
+React JS (ou React) é uma biblioteca JavaScript de código aberto usada para construir interfaces de usuário (UIs) interativas e reativas, dividindo-as em componentes reutilizáveis que gerenciam seu próprio estado, facilitando a criação de aplicações web complexas e de página única (SPAs) de forma eficiente. Assm, usar Express.js com React.js permite criar aplicações full-stack robustas, onde o Express atua como backend (API RESTful) gerenciando dados e regras de negócio, enquanto o React gerencia a interface do usuário no frontend. 
+
 Atualmente, o para criar uma interface de usuário se usa `Vite`, uma ferramenta de construção (build tool), 
 extremamente rápida, criada para acelerar o desenvolvimento de aplicações `frontend`.
 
@@ -29,7 +32,7 @@ Para rodar o frontend digite no terminal: `npm run dev`. E assim o frontend ser�
 
 ## 2. Utilizando o **CORS**
 Como você deve ter visto, o frontend React está rodando na porta `5137` enquando o backend na `3000`. Por padrão
-ss navegadores utilizam o **CORS** (Cross-Origin Resource Sharing), que é um mecanismo de segurança dos navegadores que bloqueia requisições entre domínios diferentes, como no caso do frontend e backend. No Express, usa-se o pacote `cors` como middleware para configurar cabeçalhos HTTP (`Access-Control-Allow-Origin`) que autorizam essas origens, permitindo o compartilhamento de recursos. Para isso:
+os navegadores utilizam o **CORS** (Cross-Origin Resource Sharing), que é um mecanismo de segurança dos navegadores que bloqueia requisições entre domínios diferentes, como no caso do frontend e backend. No Express, usa-se o pacote `cors` como middleware para configurar cabeçalhos HTTP (`Access-Control-Allow-Origin`) que autorizam essas origens, permitindo o compartilhamento de recursos. Para isso:
 
 1. No terminal, instale o pacote com o comando:
     ```bash
@@ -38,8 +41,8 @@ ss navegadores utilizam o **CORS** (Cross-Origin Resource Sharing), que é um me
 
 2. Uso básico (Permitir todas as origens - Geralmente para desenvolvimento):
     ```js
-    const express = require('express');
-    const cors = require('cors');
+    import express from "express";
+    import cors from "cors";
     const app = express();
 
     app.use(cors()); // Habilita CORS para todas as rotas e origens
@@ -59,8 +62,79 @@ ss navegadores utilizam o **CORS** (Cross-Origin Resource Sharing), que é um me
         res.json({ msg: 'Esta rota tem CORS específico' });
     });
     ```
-## 2. Usando `session` com React e Express
-Para utilizar sessões com React e Express, você precisa entender que o React não "guarda" a sessão; 
+## 3. Utilizando a sessão (`session`).
+Uma sessão é um mecanismo para manter o estado de um usuário entre múltiplas requisições HTTP, armazenando dados temporários no
+servidor e usando um cookie com ID de sessão no navegador para identificá-lo, permitindo recursos como login, carrinhos de
+compras e preferências personalizadas, usando o middleware `express-session` para gerenciar isso de forma segura e eficiente. 
+
+1. No terminal do seu projeto, instale o pacote: 
+    ```bash
+    npm install express-session
+    ```
+2. Importe o módulo e configure o middleware antes das suas rotas no arquivo principal (`App.js`):
+    ```javascript
+    import express from "express";
+    import session from "express-session"; // Importa o módulo
+    const app = express();
+
+    // Configuração do middleware de sessão
+    app.use(session({
+        name: 'connect.sid', // Nome do cookie
+        secret: 'uma-chave-secreta-muito-segura', // Essencial para assinar o cookie. Substitua por uma string segura
+        resave: true, // Salva a sessão mesmo se não modificada
+        saveUninitialized: true, // Salva sessão para usuários não logados
+        cookie: { secure: true } // Em produção, use secure: true e HTTPOnly. Defina como true se usar HTTPS
+    }));
+
+    // 1. Exemplo de rota para usar a sessão
+    app.get('/', (req, res) => {
+        // Se a sessão 'views' não existir, inicia com 0, senão, incrementa
+        req.session.views = (req.session.views || 0) + 1;
+        res.send(`Você visitou esta página ${req.session.views} vezes.`);
+    });
+
+    // 2. Rota de Login
+    app.post('/login', (req, res) => {
+      const { username, password } = req.body;
+      // Valide usuário/senha aqui
+      if (username === 'usuario' && password === '123') {
+        req.session.user = username; // Cria a sessão [2]
+        res.send('Login bem-sucedido');
+      } else {
+        res.status(401).send('Credenciais inválidas');
+      }
+    });
+
+    // 3. Rota Protegida (Exemplo)
+    app.get('/dashboard', (req, res) => {
+      if (req.session.user) {
+        res.send(`Olá ${req.session.user}, bem-vindo!`);
+      } else {
+        res.status(401).send('Não autorizado');
+      }
+    });
+
+    // 4. Rota de Logout
+    app.post('/logout', (req, res) => {
+      req.session.destroy((err) => { // Destrói a sessão [5]
+        if (err) {
+          return res.send('Erro ao sair');
+        }
+        res.clearCookie('connect.sid'); // Limpa o cookie da sessão
+        res.send('Logout realizado com sucesso');
+      });
+    });
+
+    app.listen(3000, () => console.log('Servidor rodando na porta 3000'));
+    ```
+
+Como funciona
+- Cookie: O express-session gera um ID único e o envia para o navegador do usuário em um cookie.
+- Requisições subsequentes: O navegador envia o cookie de volta com cada requisição.
+- req.session: O middleware usa o ID para carregar os dados da sessão (armazenados no servidor) no objeto req.session para você usar nas suas rotas.
+- Segurança: Em produção, configure `cookie: { secure: true, httpOnly: true, sameSite: 'strict' }` para proteger contra ataques. 
+
+Além disso, você precisa entender que o React não "guarda" a sessão,
 quem faz isso é o **Navegador** através de um Cookie, e o servidor Express apenas reconhece esse cookie.
 Para utilizar o session você precisa configurar o backend e o frontend:
 

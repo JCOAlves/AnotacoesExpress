@@ -18,5 +18,4 @@ O Express é um framework web para Node.js que facilita e acelera a criação de
 3. [Conexão ao banco de dados *MySQL*](ConexaoBD.md).
 4. [Agrupando rotas](Agrupamento.md).
 5. [Imprementando funções *CRUD*](CRUD.md).
-6. [Imprementando *Session*](Sessao.md).
-7. [Utilizando *React JS* com *Express JS*](React.md).
+6. [Frameworks e ferramentas de desenvolvimento em projetos Espress](AvancoExpress.md).
