@@ -53,7 +53,7 @@ os navegadores utilizam o **CORS** (Cross-Origin Resource Sharing), que é um me
     const corsOptions = {
         origin: 'http://localhost:5173', // URL do seu frontend (Vite/React)
         methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
-        allowedHeaders: ['Content-Type', 'Authorization'], // Necessário para o JWT
+        allowedHeaders: ['Content-Type', 'Authorization'], // Tipos de cabeçalhados permitidos nas requisição
         optionsSuccessStatus: 200
     };
     app.use(cors(corsOptions));
@@ -149,7 +149,10 @@ Para utilizar o session você precisa configurar o backend e o frontend:
     // No app.js
     app.use(cors({
         origin: 'http://localhost:5173', // URL do seu React
-        credentials: true                // PERMITE enviar cookies/sessão
+        credentials: true,               // PERMITE enviar cookies/sessão
+        methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+        allowedHeaders: ['Content-Type', 'Authorization'], // Tipos de cabeçalhados permitidos nas requisição
+        optionsSuccessStatus: 200
     }));
 
     app.use(session({
