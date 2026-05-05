@@ -148,8 +148,8 @@ Para utilizar o session você precisa configurar o backend e o frontend:
     ```js
     // No app.js
     app.use(cors({
-        origin: 'http://localhost:5173', // URL do seu React
-        credentials: true,               // PERMITE enviar cookies/sessão
+        origin: 'http://localhost:5173', // URL do Frontend
+        credentials: true, // PERMITE enviar cookies/sessão
         methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
         allowedHeaders: ['Content-Type', 'Authorization'], // Tipos de cabeçalhados permitidos nas requisição
         optionsSuccessStatus: 200
